@@ -52,6 +52,12 @@ mushroom$Bruises[as.character(mushroom$Bruises)=="f"] <- "no"
 
 #Check the Results
 str(mushroom)
-mushroom
+summary(mushroom)
 
 ```
+```{r}
+table(mushroom$Cap_Color)
+#Pie chart on Mashroom Colors
+pie(table(mushroom$Cap_Color))
+```
+
