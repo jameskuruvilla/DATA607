@@ -1,0 +1,57 @@
+---
+title: "DATA607 - Week1 Assignment"
+author: "James Kuruvilla"
+date: "September 4, 2017"
+output: html_document
+---
+**Task to complete : study the dataset and the associated description of the data (i.e. "data dictionary"). You may need to look around a bit, but it's there! You should take the data, and create a data frame with a subset of the columns in the dataset. You should include the column that indicates edible or poisonous and three or four other columns. You should also add meaningful column names and replace the abbreviations used in the data-for example, in the appropriate column, "e" might become "edible." Your deliverable is the R code to perform these transformation tasks.**
+
+```{r}
+library(RCurl)
+
+#Read Data from the URL
+mushroomOriginal<-getURL("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data")
+
+mushroom<-data.frame(read.csv(text=mushroomOriginal, header=F,stringsAsFactors = FALSE))
+
+#Select only first 5 Columns. Classes is one of the columns
+mushroom<-mushroom[,c("V1","V2","V3","V4","V5")]
+
+#Rename the columns with desirable names
+names(mushroom)= c("Classes","Cap_Shape","Cap_Surface","Cap_Color","Bruises")
+
+#Transform the contents of the columns with description as per the given data dictionary
+mushroom$Classes[as.character(mushroom$Classes)=="e"] <- "edible"
+mushroom$Classes[as.character(mushroom$Classes)=="p"] <- "poisonous"
+
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="b"] <- "bell"
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="c"] <- "conical"
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="x"] <- "convex"
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="f"] <- "flat"
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="k"] <- "knobbed"
+mushroom$Cap_Shape[as.character(mushroom$Cap_Shape)=="s"] <- "sunken"
+
+mushroom$Cap_Surface[as.character(mushroom$Cap_Surface)=="f"] <- "fibrous"
+mushroom$Cap_Surface[as.character(mushroom$Cap_Surface)=="g"] <- "grooves"
+mushroom$Cap_Surface[as.character(mushroom$Cap_Surface)=="y"] <- "scaly"
+mushroom$Cap_Surface[as.character(mushroom$Cap_Surface)=="s"] <- "smooth"
+
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="n"] <- "brown"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="b"] <- "buff"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="c"] <- "cinnamon"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="g"] <- "gray"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="r"] <- "green"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="p"] <- "pink"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="u"] <- "purple"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="e"] <- "red"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="w"] <- "white"
+mushroom$Cap_Color[as.character(mushroom$Cap_Color)=="y"] <- "yellow"
+
+mushroom$Bruises[as.character(mushroom$Bruises)=="t"] <- "bruises"
+mushroom$Bruises[as.character(mushroom$Bruises)=="f"] <- "no"
+
+#Check the Results
+str(mushroom)
+mushroom
+
+```
