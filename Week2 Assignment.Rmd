@@ -1,0 +1,51 @@
+---
+title: "Week2_Assignment"
+author: "James Kuruvilla"
+date: "September 9, 2017"
+output: html_document
+---
+
+# Introduction
+
+**Following Packages are to be installed for this assignment**
+
+RMySQL  
+htmlTable  
+
+
+```{r setup, include=FALSE}
+
+# Load Required Libraries
+library("RMySQL")
+library("sqldf")
+library("htmlTable")
+```
+
+# Movie Rating
+```{r}
+mydb = dbConnect(MySQL(), user='data607', password='testpassword', dbname='movies', host='localhost')
+
+mr <- dbGetQuery(mydb, "select Movie_name ,Rated_by ,Rating ,Creation_date_time from movie_rating")
+mr<- as.data.frame(mr)
+
+htmlTable(mr, caption = 'Movie Rating By Individual')
+
+
+
+```
+
+# Average Rating of each movie
+
+```{r results='hide', message=FALSE, warning=FALSE}
+
+mr_avg <- dbGetQuery(mydb, "select movie_name,avg(rating) Rating from movie_rating group by movie_name")
+
+#mr_avg<-sqldf("select movie_name,avg(creation_date_time) Rating from mr group by movie_name")
+
+```
+
+```{r}
+
+htmlTable(mr_avg, caption = "Avg Movie Rating")
+```
+
