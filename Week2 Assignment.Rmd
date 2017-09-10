@@ -49,3 +49,10 @@ mr_avg <- dbGetQuery(mydb, "select movie_name,avg(rating) Rating from movie_rati
 htmlTable(mr_avg, caption = "Avg Movie Rating")
 ```
 
+#### Script to export the data frame mr into the file C:\\users\\james\\movie_rating.csv
+
+```{r}
+
+write.csv(mr, file = "C:\\Users\\james\\movie_rating.csv", row.names = FALSE)
+
+```
