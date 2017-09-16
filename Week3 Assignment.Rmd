@@ -1,0 +1,147 @@
+---
+title: "Week3 Assignment"
+author: "James Kuruvilla"
+date: "September 11, 2017"
+output: html_document
+---
+
+
+#### 3. Copy The introductory example. The vector 'name' stores the  extracted names
+**a. Use the tools of this chapter to rearrange the vector so that all elements conform to the standard first_name last_name.**
+
+```{r setup, include=TRUE}
+library(stringr)
+
+raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert"
+
+name<-unlist(str_extract_all(raw.data,"[[:alpha:], . ]{2,}"))
+name
+
+#Remove Titles like Rev, Dr. Mr. etc
+full_names <- str_replace(name, pattern = "Rev. |Dr. |Mr. ", replacement = ""); 
+
+#Define Data Frame and the varibles
+# ================================
+df = data.frame(First_Name = character(), Last_Name = character())
+First_Name <- character(length(full_names))
+Last_Name <- character(length(full_names))
+# ================================
+
+for (i in 1:length(full_names))
+
+  {
+   if (str_detect(full_names[i],",")) #if there is a coma in the name, reverse the order
+     {
+         Last_Name[i] <- str_extract(full_names[i], "[[:alpha:]+]{2,}")
+         # Take the name after the space
+         First_Name[i] <- str_trim(str_extract(full_names[i], "[[:space:]][[:alpha:]+]{2,}"))
+         # Concatenate in reverse order
+         full_names[i] <- str_c(First_Name[i],Last_Name[i],sep=" ")
+     }
+  else 
+     {
+       First_Name[i] <- str_extract(full_names[i], "[[:alpha:]+]{2,}")
+       Last_Name[i] <- str_trim(str_extract(full_names[i], "[[:space:]][[:alpha:]+]{2,}")) # Take the name after the space
+     }
+ }
+full_names
+df <- data.frame(First_Name,Last_Name,stringsAsFactors = FALSE)
+df
+
+```
+**b. Construct Logical vector indicating whether a character has a title (i.e. Rev. and Dr.)**
+
+
+```{r}
+logi_vec<-str_detect(name,"[[:alpha:]+]{2,3}[.]")
+
+logi_vec
+```
+
+
+
+
+**c. Construct Logical vector indicating whether a character has a second name**
+
+```{r}
+logi_vec_sn <- str_detect(name, "[[:upper:]]\\.")
+
+logi_vec_sn
+
+```
+
+#### 4. Describe the type of strings that conform  to the following regular expressions and construct an example that is matched by the regular expression
+
+**a. [0-9]+\\$**
+
+This will find the match for a string consists of ONLY digits from 0 to 9 and ends with a $ sign 
+
+Ex: 
+```{r}
+s <- "This is a sample string with 81292323$ and 9823429 for testing"
+str_extract(s,"[0-9]+\\$")
+
+```
+
+**b. \\b[a-z]{1,4}\\b**
+
+This is to find a matching string consists of between 1 and 4 lowercase letters and its between 2 word edges. 
+
+```{r}
+s1 <- "This sentence is a set of words to be tested. All the words consists of 4 or less Lower case letters will be selected"
+
+str_extract_all(s1,"\\b[a-z]{1,4}\\b")
+
+```
+**c. .*?\\.txt$**
+
+This expression will find a matching string whih ends with .txt but before that is optional.
+
+```{r}
+tst <- c("kljsdfa.txt$","askd.txt",".txt", "aslkdjatxt","sdasd.txtasd")
+
+unlist(str_extract_all(tst,".*?\\.txt$"))
+
+```
+
+**d. \\d{2}/\\d{2}/\\d{4}**  
+
+This will search and return a string with 2 digits then '/' another 2 digits the '/' and then 4 digits. like (dd/dd/dddd)
+
+```{r}
+
+dt <- "The birth date of Mr.E is 02/29/2000. So every year that is Celebrated on 02/28th."
+
+str_extract_all(dt,"\\d{2}/\\d{2}/\\d{4}")
+
+
+```
+
+**e. <(.+?)>.+?</\\1>**  
+This is like html tags. This means a string that cantains two pairs of angle brakets with one backreference. Inside the pair of angle brackets, there must be some characters. 
+
+```{r}
+
+txt <- c("<head>hello</head>", "<body>world</body>", "<>notgood<>")
+
+unlist(str_extract_all(txt, "<(.+?)>.+?</\\1>"))
+
+```
+
+### 9. The following code hides a secret message. Crack it with R and regular expressions. Hint: Some of the characters are more revealing than others! The code snippet is also available in the materials at www.r-datacollection.com.
+
+
+"clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigO d6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5 fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+
+```{r}
+cd <- "clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigO d6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5 fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+
+code<-unlist(str_extract_all(cd,"[[:upper:].]{1,}"))
+
+code <- paste(code, collapse = "")
+
+code <- str_replace_all(code, pattern = "\\.", replacement = " ")
+
+code
+```
+
