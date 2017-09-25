@@ -1,5 +1,5 @@
 ---
-title: "DATA607 - Projet 1"
+title: "DATA607 - Project 1"
 author: "James Kuruvilla"
 date: "`r Sys.Date()`"
 output:
