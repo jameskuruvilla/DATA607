@@ -36,7 +36,7 @@ library(htmlTable)
 
 ## Download The Text File From Github
 ```{r}
-# Download FIle
+# Download File
 #--------------
 # https://stackoverflow.com/questions/23028760/download-a-file-from-https-using-download-file
 
@@ -59,7 +59,7 @@ close(v_conn)
 ```
 
 
-## Replace '->' with '>>' and Replace '-' with "" and Cleanup Empty lines and 2 heading lines
+## Replace '->' with '>>' and Replace '-' with "" and then cleanup empty lines and 2 heading lines
 ```{r}
 #use gsub() to replace all the text you don't want with an empty string.
 #-----------------------------------------------------------------------
@@ -76,7 +76,7 @@ tournament <- tournament[-(1:2)]           # Remove the First 2 lines as those a
 head(tournament)
 ```
 
-## Split the 2 lines of a player into 2 vectors.
+## Split the 2 lines of a player information into 2 vectors.
 
 ```{r}
 # =====================================
