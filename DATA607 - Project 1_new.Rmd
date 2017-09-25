@@ -1,0 +1,224 @@
+---
+title: "DATA607 - Projet 1"
+author: "James Kuruvilla"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: true
+    #toc_float: true
+   # theme: united
+    #highlight: tango
+    number_sections: true
+    collapsed: true
+    smooth_scroll: true
+    df_print: paged
+
+---
+
+# Project
+![](C:\Users\james\Documents\GitHub\DATA607\DATA607\Project1_1.JPG)
+![](C:\Users\james\Documents\GitHub\DATA607\DATA607\Project1_2.JPG)
+
+## Load Following Libraries
+
+1. stringr    
+2. dplyr  
+3. reshape2  
+4. htmlTable  
+
+```{r setup, include=FALSE}
+library(stringr)
+library(dplyr)
+library(reshape2)
+library(htmlTable)
+```
+
+## Download The Text File From Github
+```{r}
+# Download File
+#--------------
+# https://stackoverflow.com/questions/23028760/download-a-file-from-https-using-download-file
+
+url<-"https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/tournament.txt"
+
+r_file<- "tournament.txt"
+
+downloader::download(url, r_file)
+
+# Read text File into vector
+#---------------------------
+#https://stackoverflow.com/questions/23001548/dealing-with-readlines-function-in-r
+
+
+v_conn <-file(r_file,open="r")
+
+tournament.raw <- readLines(v_conn, warn = FALSE)
+
+close(v_conn)
+```
+
+
+## Replace '->' with '>>' and Replace '-' with "" and then cleanup empty lines and 2 heading lines
+```{r}
+#use gsub() to replace all the text you don't want with an empty string.
+#-----------------------------------------------------------------------
+#https://stackoverflow.com/questions/13529360/replace-text-within-parenthesis-in-r
+
+tournament <- gsub("-{3,}", "",gsub("->", ">>",tournament.raw))
+
+# Following code also will work the same way
+#tournament <- str_replace_all(str_replace_all(tournament.raw, "->", ">>"), "-{3,}", "")
+
+tournament <- tournament[tournament != ""] # Remove the emtpy lines
+tournament <- tournament[-(1:2)]           # Remove the First 2 lines as those are headings
+
+head(tournament)
+```
+
+## Split the 2 lines of a player information into 2 vectors.
+
+```{r}
+# =====================================
+# Str_sub OR substr OR substring can be used to cut the specific character set from the strng 
+# https://www.rdocumentation.org/packages/stringr/versions/1.1.0/topics/str_sub
+# http://rfunction.com/archives/1692
+# =====================================
+
+# extract only the lines starts with a digit
+tournament.fmt1<- tournament[str_detect(substr(tournament, 1, 6), "[0-9]")]   
+
+# extract only the lines starts with an alphabet
+tournament.fmt2 <- tournament[str_detect(str_sub(tournament, 1, 6), "[A-Z]{2,2}")]  
+
+```
+## Parse both vectors (lines) into two dataframes and combine those by columns using cbind.
+
+```{r}
+# Extract column values from these 2 vectors.
+fmt1.df <- data.frame(   Player_num   = as.numeric(str_sub(tournament.fmt1, 1,  6)),
+                         Player_name  = str_trim(str_sub(tournament.fmt1, 8,  40), side="both"),
+                         Total_pts    = as.numeric(str_sub(tournament.fmt1, 42, 46)),
+                         Round1       = str_sub(tournament.fmt1, 48, 52),
+                         Round2       = str_sub(tournament.fmt1, 54, 58),
+                         Round3       = str_sub(tournament.fmt1, 60, 64),
+                         Round4       = str_sub(tournament.fmt1, 66, 70),
+                         Round5       = str_sub(tournament.fmt1, 72, 76),
+                         Round6       = str_sub(tournament.fmt1, 78, 82),
+                         Round7       = str_sub(tournament.fmt1, 84, 88), stringsAsFactors=FALSE)
+
+head(fmt1.df)
+
+fmt2.df <- data.frame(   Player_state  = str_trim(str_sub(tournament.fmt2, 1,  6), side="both"),
+                 Uscf_id       = str_extract(str_sub(tournament.fmt2, 8,  40), "\\d+"),
+                 Pre_rating    = as.numeric(str_extract(str_sub(tournament.fmt2, 8,  40), "(?<=R: ).\\d+(?=)")),
+                 Post_rating   = as.numeric(str_extract(str_sub(tournament.fmt2, 8,  40), "(?<=>>).\\d+(?=)")),
+                 stringsAsFactors=FALSE)
+head(fmt2.df)
+
+# Combine both data frames by columns
+# https://stat.ethz.ch/R-manual/R-devel/library/methods/html/cbind2.html 
+tournament.df <-cbind(fmt1.df, fmt2.df)
+
+head(tournament.df)
+
+```
+## Steps to arrive at the final result
+```{r}
+# Select all columns except round columns
+player_df <- select(tournament.df, Player_num:Total_pts, Player_state:Post_rating)  #Select requires the dplyr package
+
+# Select only player number and all the rounds the player played
+rounds <- tournament.df %>% select(Player_num, Round1:Round7)
+
+head(rounds)
+```
+
+```{r}
+# Following link says how melt works 
+# https://tgmstat.wordpress.com/2013/10/31/reshape-and-aggregate-data-with-the-r-package-reshape2/
+
+melt_rounds <- rounds%>% melt(id.var=c("Player_num"), value.name="Result_opp")
+
+head(melt_rounds)
+```
+
+```{r}
+mut_melt_rounds <- 
+    melt_rounds%>% #Add the columns round, Result and opp_num (opponent Number)
+    mutate(Round = as.numeric(gsub("Round", "",variable)), # Replace "round" with "" in the column 'variable'
+    Result  = str_extract(Result_opp, "^\\w+"),            # Extract the begginning word
+    Opp_num = as.numeric(str_extract(Result_opp, "\\d+$")) # Extract the ending Digits.
+                          ) 
+head(mut_melt_rounds)
+
+```
+
+```{r}
+#sel_mut_melt_rounds <- mut_melt_rounds %>% select(c(Player_num,Round,Result,Opp_num)) # 
+
+sel_mut_melt_rounds <- mut_melt_rounds %>% select(-c(variable, Result_opp)) # Remove the columns 'variable' and 'Result_opp'
+
+head(sel_mut_melt_rounds);head(player_df )
+
+```
+
+```{r}
+# Join sel_mut_melt_rounds and player_df on op_num and Payer_num 
+# Following Link gives more information on Joins
+# http://dplyr.tidyverse.org/reference/join.html 
+
+join_sel_mut_melt_rds <- sel_mut_melt_rounds %>% 
+                          inner_join(select(player_df, Player_num, Pre_rating,Post_rating), by = c("Opp_num" = "Player_num"))
+
+head(join_sel_mut_melt_rds)
+
+
+```
+
+```{r}
+sel_p <- join_sel_mut_melt_rds %>% select(Player_num, Round, Result, Opp_num, Pre_rating)
+
+head(sel_p)
+
+sort_sel_p <- sel_p %>% arrange(Player_num, Round) ;head(sort_sel_p)
+
+names(sort_sel_p)[names(sort_sel_p) == "Pre_rating"] <- "Opp_pre_rating" ;head(sort_sel_p)
+
+
+```
+
+## Aggreate to Find the Average pre-rating of Opponents
+
+```{r}
+player.opp_avg_rating <- sort_sel_p%>%group_by(Player_num) %>% summarise(Opp_avg_pre_rating = round(mean(Opp_pre_rating)))
+
+player_df <- player.opp_avg_rating %>% inner_join(player_df, by="Player_num")
+
+player_df_final <- player_df %>%  select(Player_name, Player_state, Total_pts,Pre_rating, Opp_avg_pre_rating) 
+
+```
+
+
+# Result : Chess Player Details
+```{r}
+htmlTable(player_df_final)
+```
+
+
+**The table is exported into a file 'CHESS PLAYERS.csv using following command into the local drive and then loaded into GitHub. The following link gives the output from GitHub.**
+
+```{r}
+write.csv(player_df_final, "CHESS PLAYERS.csv", row.names=FALSE)
+```
+
+
+## [Link for Chess Player Details](https://github.com/jameskuruvilla/DATA607/blob/master/CHESS%20PLAYERS.csv)
+  
+  
+  
+
+
+
+
