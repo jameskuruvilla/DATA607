@@ -28,12 +28,10 @@ subtitle: CUNY MSDS - DATA607 - Home Work-5
 #  Library Definition
 
 **library(tidyverse)**  
-**library(stringr)**
 
 ```{r include = FALSE}
 
 library(tidyverse)
-library(stringr)
 
 ```
 # Read CSV File from  GitHub
@@ -113,7 +111,7 @@ airlines_wide_totals
 
 ```
 
-# Find the ratio of arrival delay of the two airlines by city 
+# Find the Probability of arrival delays of the two airlines by city 
 
 ```{r}
 
@@ -128,7 +126,11 @@ airlines_final
 
 ```
 
-# Over all ratio of arrival delay of the two airlines
+## Conclusion 1
+**In the above table, the last column gives the probability of a flight being delayed by City and Airlines.
+For Example in Los Angeles, the probability of a delayed flight by ALASKA airlines is slightly LOWER than that of AM WEST Airlines (11.09% < 14.43%) and so and so forth for all the cities. Please notice the probability of the delayed flight when we cosider the over all delay ratio of the two airline below** 
+
+# Over all Probability of arrival delays of the two airlines
 
 ```{r}
 airlines_delay_ratio <- airlines_wide_totals
@@ -150,6 +152,25 @@ airlines_delay_ratio$Over_All_Delay_Ratio <-
 airlines_delay_ratio
 ```
 
+##Conclusion 2
 
+**When we consider probability of a delayed flight aross all the cities, ALASKA Airline carries a HIGHER probability of having a delayed flight. This is because of the difference in sample size for both airlines.** 
 
+# Probability of a randomly selected flight to be delayed
+
+```{r}
+delay_ratio <- airlines_delay_ratio
+
+delay_ratio <- airlines_delay_ratio%>% select(2,3,4)%>%
+               summarise(Total_delay = sum(Total_delay), Total_On_Time = sum(Total_On_Time))
+delay_ratio$Total <- delay_ratio$Total_delay+delay_ratio$Total_On_Time
+
+delay_ratio$Pro_Delay <-((delay_ratio$Total_delay/delay_ratio$Total_On_Time)*100)%>%round(digit=2)
+
+delay_ratio
+```
+
+##Conclusion 3
+
+**The probability of a randomly selected flight across the cities is 13.26 % (0.1326)**
 
