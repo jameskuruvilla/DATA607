@@ -1,0 +1,155 @@
+---
+title: "Airlines across five destinations"
+author: 'James Kuruvilla'
+date: "September 30, 2017"
+
+output:
+  prettydoc::html_pretty:
+    #theme: architect 
+    #theme: cayman
+    #theme: leonids
+    theme: hpstr
+    highlight: github
+    #highlight: vignette
+    toc: true
+    number_sections: false
+    collapsed: true
+    smooth_scroll: true
+    df_print: paged
+subtitle: CUNY MSDS - DATA607 - Home Work-5
+---
+
+# Assignment
+**------------------------------------------------------------------------------------------------------------**  
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment5_1.JPG)
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment5_2.JPG)
+**------------------------------------------------------------------------------------------------------------**  
+
+#  Library Definition
+
+**library(tidyverse)**  
+**library(stringr)**
+
+```{r include = FALSE}
+
+library(tidyverse)
+library(stringr)
+
+```
+# Read CSV File from  GitHub
+ I created a .csv file named assignment5_csv.csv and saved that in GitHub.
+ 
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment5_1.JPG)
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Airlines_xl.JPG)
+
+## GitHub URL
+
+```{r}
+url <- 'https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/Assignment%205_CSV.csv'
+```
+
+## Read CSV file from URL using read_csv()
+
+```{r}
+name <- c("Airlines","Status","Los_Angeles","Phoenix","San_Diego", "San_Francisco","Seattle")
+
+types = 'ccccccc'
+airlines <- read_csv(url,col_names = name, col_types =types)
+
+airlines
+```
+
+# Search NULL rows and remove.
+
+```{r}
+null_airlines <- which(is.na(airlines$Status)) 
+
+airlines<-airlines[-null_airlines,]
+airlines
+```
+## Replace NULL values in the first column with the previous value of the same column
+
+```{r}
+for (i in 1:nrow(airlines[1]))
+{
+  if (is.na(airlines[i,1])) 
+    {airlines[i,1]<- airlines[i-1,1]}
+}
+
+airlines
+```
+
+# Use gather() from the library 'tidyverse' to make the tibble long and tidy 
+
+```{r}
+
+airlines_long <- gather(airlines, City,No.Of.Flights, Los_Angeles:Seattle)
+
+airlines_long$No.Of.Flights <- as.numeric(airlines_long$No.Of.Flights)
+airlines_long
+```
+
+# Use spread() from the library 'tidyverse' to  make wide
+
+```{r}
+airlines_wide <- spread(airlines_long,Status,No.Of.Flights)
+
+#Column name 'on time' is changed to 'On_Time'
+colnames(airlines_wide)[4]<- 'On_time'
+
+airlines_wide
+```
+
+# Find  total number of flights for each city
+
+```{r}
+
+airlines_wide_totals <- airlines_wide
+
+airlines_wide_totals$Totals <- airlines_wide_totals$delayed + airlines_wide_totals$On_time 
+
+airlines_wide_totals
+
+```
+
+# Find the ratio of arrival delay of the two airlines by city 
+
+```{r}
+
+airlines_final <- airlines_wide_totals
+
+airlines_final$Ratio <-((airlines_final$delayed/airlines_final$Totals)*100) %>% round(digits=2)
+airlines_final<-airlines_final%>% arrange(City,Ratio)
+
+airlines_final$Ratio <- paste(as.character(airlines_final$Ratio),'%')
+
+airlines_final
+
+```
+
+# Over all ratio of arrival delay of the two airlines
+
+```{r}
+airlines_delay_ratio <- airlines_wide_totals
+
+airlines_delay_ratio<- airlines_delay_ratio%>%
+                       select(1,3,4,5)     %>% 
+                       group_by(Airlines)  %>%
+                       summarise(Total_delay = sum(delayed), Total_On_Time = sum(On_time))
+
+airlines_delay_ratio$Total <- airlines_delay_ratio$Total_delay + airlines_delay_ratio$Total_On_Time
+
+airlines_delay_ratio$Over_All_Delay_Ratio <- 
+                      ((airlines_delay_ratio$Total_delay/airlines_delay_ratio$Total)*100)%>% 
+                      round(digit=2)
+
+airlines_delay_ratio$Over_All_Delay_Ratio <- 
+                           paste(as.character(airlines_delay_ratio$Over_All_Delay_Ratio), '%')
+
+airlines_delay_ratio
+```
+
+
+
+
