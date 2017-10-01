@@ -127,10 +127,10 @@ airlines_final
 ```
 
 ## Conclusion 1
-**In the above table, the last column gives the probability of a flight being delayed by City and Airlines.
-For Example in Los Angeles, the probability of a delayed flight by ALASKA airlines is slightly LOWER than that of AM WEST Airlines (11.09% < 14.43%) and so and so forth for all the cities. Please notice the probability of the delayed flight when we cosider the over all delay ratio of the two airline below** 
 
-# Over all Probability of arrival delays of the two airlines
+**For Example, in Los Angeles, the probability of a delayed flight by ALASKA airlines is slightly LOWER than that of AM WEST Airlines (11.09% < 14.43%) and similarly for all the cities. Please notice the probability of the delayed flight when we consider the overall delay ratio of the two airlines below**
+
+# Overall Probability of arrival delays of the two airlines
 
 ```{r}
 airlines_delay_ratio <- airlines_wide_totals
@@ -154,7 +154,7 @@ airlines_delay_ratio
 
 ##Conclusion 2
 
-**When we consider probability of a delayed flight aross all the cities, ALASKA Airline carries a HIGHER probability of having a delayed flight. This is because of the difference in sample size for both airlines.** 
+**When we consider probability of a delayed flight across all the cities, ALASKA Airline carries a HIGHER probability of having a delayed flight. This is because of the difference in sample size for both airlines.** 
 
 # Probability of a randomly selected flight to be delayed
 
@@ -172,5 +172,5 @@ delay_ratio
 
 ##Conclusion 3
 
-**The probability of a randomly selected flight across the cities is 13.26 % (0.1326)**
+**The probability of a randomly selected flight across the cities to be delayed is 13.26 % (0.1326)**
 
