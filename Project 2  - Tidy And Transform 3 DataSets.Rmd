@@ -41,8 +41,6 @@ library(stringr)
 library(extrafont)
 library(ggthemes)
 library(lubridate)
-extrafont::loadfonts(device="win")
-extrafont::font_import("C:/Windows/Fonts/", pattern = 'GARA')
 
 ```
 
