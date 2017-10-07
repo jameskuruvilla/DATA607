@@ -311,7 +311,7 @@ ggplot(data=filtered_water, mapping = aes(x=unit, y= result))+
 
 
 ## Convert Fahrenheit to Celcius
-** Convert the observations in such a way that, unit of water temperature will be thesame for all the observations**
+**Convert the observations in such a way that, unit of water temperature will be the same for all the observations**
 
 ```{r}
 fahrenheit <- which(filtered_water$unit=='Deg. Fahrenheit')
@@ -452,8 +452,8 @@ p<-ggplot(data=mvc_acc_VehType, aes(x=VehType1, y = totInjured, fill = borough))
   xlab("Vehicle Type") + ylab("Total Number Of Injured") 
 
 
-# The linkg https://cran.r-project.org/web/packages/ggthemes/ggthemes.pdf
-# Gives all the information about the ggthemes.
+# Refer https://cran.r-project.org/web/packages/ggthemes/ggthemes.pdf
+# For more information on ggthemes
 
 p + theme_economist(horizontal=FALSE) +
 scale_colour_economist() +
@@ -464,7 +464,7 @@ coord_flip()
 ![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\mvc_acc_VehType.PNG)
 
 ### Conclusion 1
-The above picture clearly says that the number of accidents is higher in Brooklyn and Queens compared to other boroughs. The possible reasons are (1) demegraphy of the residents (2) Traffic regulations (3) Busy streets and businesses etc. Also The above image shows that total number of accidents by Passenger Vehicle OR SUV/Staion Wagon is much higher than Pickup-truck, taxi or van. But we can not conclude that, the accidents rate of such vechicles are higher. Because, we dont take into account the total number of vechicles in those cities on during that period.In this data, We consider only the vehicles made accidents. In order to make such concusion, we need to have the number of passenger vehicles or SUV/STA.WAGON in New York City during that period. That will allow us the calculate percentage of such vehicles made accident. Simillary, The number Taxi or Pickup truck may be much lesser than other kids of cars and hence the number of accidents made by those cars also will be considerably low in number
+The above picture clearly says that the number of accidents is higher in Brooklyn and Queens compared to other boroughs. The possible reasons are (1) demography of the residents (2) Traffic regulations (3) Busy streets and businesses etc. Also, The above image shows that total number of accidents by Passenger Vehicle OR SUV/Station Wagon is much higher than Pickup-truck, taxi or van. But we cannot conclude that, the accidents rate of such vehicles are higher. Because, we don't take into account the total number of vehicles in those cities on during that period. In this data, we consider only the vehicles made accidents. In order to make such conclusion, we need to have the number of passenger vehicles or SUV/STA.WAGON in New York City during that period. That will allow us the calculate percentage of such vehicles made accident. Similarly, The number Taxi or Pickup truck may be much lesser than other kids of cars and hence the number of accidents made by those cars also will be considerably low in number
 
 
 ## No. of accidents by contributing factor  
@@ -500,14 +500,16 @@ ggplot(data=mvc_acc_Reason, aes(x=ConFacVeh1, y = totInjured, fill = borough)) +
 ![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\mvc_acc_Reason.PNG)
 
 ### Conclusion 2
-The above picture clearly says that out of all the contributing factors of the accidents, Driver Distraction, and failure to give right of way caused more accidents. Again this kind of accidents are more in brooklyn and Queens. This prompts to make more research on tha areas like (1) What are the main cause of distraction - (Cell Phone, Need of high vigilance while driving ( due to road conditions)) (2) More accidents are made by people from outside the town? - Lack of familarity of the roads could be one reason for not giving the right of way (3) Study the need to enforce defensive driving lessons (4) Check if other reasons like education, age, background etc has relation to the such contributing factors
+The above picture clearly says that out of all the contributing factors of the accidents, Driver Distraction, and failure to give right of way caused more accidents. Again, this kind of accidents are more in Brooklyn and Queens. This prompts to make more research on the areas like (1) What are the main cause of distraction - (Cell Phone, need of high vigilance while driving (due to road conditions)) (2) More accidents are made by people from outside the town? - Lack of familiarity of the roads could be one reason for not giving the right of way (3) Study the need to enforce defensive driving lessons (4) Check if other reasons like education, age, background etc. has relation to the such contributing factors.
 
 ### Comments
-Following items also can be researhed using this dataset.
+Following items also can be researched using this dataset.
 
-1. Based on the frequency of accidents in the same location, extra regulations / traffic signals and lights can be deployed.But the exact street address is missing in most cases. Officers should pay more attention and fill all the information to reduce future accidents
+1. Based on the frequency of accidents in the same location, extra regulations / traffic signals and lights can be deployed. But the exact street address is missing in most cases. Officers should pay more attention and fill all the information to reduce future accidents
+2. As the latitude and longitude is available, comparison with other US cities (with heat maps) will be possible and hence adopt best traffic practices/regulations, road planning, mass commuting etc. from the cities where accidents are low.
 
-2. As the lattitude and longitude is available, comparision with other US cities (with heat maps) will be possible and hence adopt best traffic practices/regulations, road planning, mass commuting etc from the cities where accidents are low.
+3. The number of people injured by pedestrians, cyclist etc. are also available in this data set which opens a totally new area of study and investigations. 
+
 
 
 
