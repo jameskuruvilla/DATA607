@@ -1,0 +1,521 @@
+---
+title: "Tidy And Transform 3 DataSets"
+author: 'James Kuruvilla'
+date: "October 7, 2017"
+
+output:
+  prettydoc::html_pretty:
+    #theme: architect 
+    #theme: cayman
+    theme: leonids
+    #heme: hpstr
+   
+    #highlight: github
+    #highlight: vignette
+    
+    toc: true
+    #number_sections: false
+    collapsed: true
+    #smooth_scroll: true
+    #df_print: paged
+subtitle: CUNY MSDS - DATA607 - Project 2
+---
+
+# Assignment
+
+**------------------------------------------------------------------------------------------------------------**  
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Project 2.JPG)
+**------------------------------------------------------------------------------------------------------------**  
+
+#  Library Definition
+
+**library(tidyverse)**   
+**library(stringr)**  
+**library(ggthemes)**  
+**library(lubridate)**  
+
+
+```{r include = FALSE}
+library(tidyverse)
+library(stringr)
+library(extrafont)
+library(ggthemes)
+library(lubridate)
+extrafont::loadfonts(device="win")
+extrafont::font_import("C:/Windows/Fonts/", pattern = 'GARA')
+
+```
+
+
+# Data Set 1 : Coal Consumption By Country
+
+**The first data set is downloaded from the link** **https://catalog.data.gov/dataset/annual-coal-consumption-by-country **
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\CoalDataSource.JPG)
+
+
+
+**In order to keep all the data sets of the projects in the in the same place,  the data has been saved as CSV format in gitHub. The URL for the file is**  **https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/Coal_Consumption_By_Country.csv **
+
+## Read data from gitHub
+```{r}
+coal_url <-'https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/Coal_Consumption_By_Country.csv'
+
+```
+
+##Tidy the dataset
+### Skip first 2 lines to eliminate the headings
+
+coal <- read_csv(coal_url, skip = 2)
+
+```{r include = FALSE}
+
+coal <- read_csv(coal_url, skip = 2)
+```
+
+### Give the title 'country ' to the country column
+```{r}
+
+colnames(coal)[1] <- 'country'
+glimpse(coal)
+```
+
+### Remove the 2nd column X2 which is empty
+
+```{r}
+coal <- coal[-2]
+
+glimpse(coal)
+```
+
+### Remove Null rows and make the data set tidy and long using gather()
+
+```{r}
+coal_long<-drop_na(coal)%>%gather(year,consumption, -country) # '-country' => all columns except country
+
+summary(coal_long)
+```
+
+###change the data type of 'consumption' to numeric and  'year' to integer
+
+```{r}
+coal_long$consumption <- as.numeric(coal_long$consumption)
+coal_long$year        <- as.integer(coal_long$year)
+
+summary(coal_long)
+unique(coal_long$country)
+```
+
+### Separate the country and the noncountry datasets from the main dataset.
+#### Save the elements with country name in a tibble called coal_country
+
+```{r}
+# We notice from the unique list of country colum that there are non-country elements in the column.
+# Make a list of such items from this list
+noncountries <- c("North America", "Central & South America" , "World","Antarctica", "Europe", "Eurasia","Middle East","Africa","Asia & Oceania")
+
+#Find the ids of the the elements with noncountries as 'country'
+matches<- which(!is.na(match(coal_long$country, noncountries)))
+
+# Save countries in a separate dataset called coal_country
+coal_country <- coal_long[-matches,]
+```
+
+#### Save non-countries in a separate dataset called coal_region
+
+```{r}
+coal_region <- coal_long[matches,]
+
+summary(coal_region) ; summary(coal_country)
+
+```
+
+## Visualizing the coal Dataset
+```{r}
+ggplot(data=coal_region, mapping = aes(x=year, y = consumption)) +
+  geom_smooth(mapping = aes(color = country), method = 'loess')
+
+```
+
+## Conclusion
+
+The top pink line says that, coal consumption has increased dramatically in the last decade worldwide. All of that increase appears to be due to changes in the green line Asia and Oceania. The rest of the world actually slightly decreased its consumption over that same time period.
+
+# Data Set 2 : Austin Texas Water Quality Sampling Data
+
+The second data set is the water quality data from the City of Austin, Texas. This data set comes directly from the City of Austin through their data portal located at data.austintexas.gov. It contains the results of over 1.14 million water quality tests performed on creeks, springs, wells, lakes, and other bodies of water by city staff. If we scroll down on the webpage, you'll see a description of the data set, followed by what we call metadata, a description of the specific columns that are included in the data set, and this includes the name of the column, a description of the kind of data you'll find in that column, and then the data type used for that variable.
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\AustinTexasWaterQualityData.JPG)
+
+The URL of the site is 
+https://data.austintexas.gov/Environment/Water-Quality-Sampling-Data/5tye-7ray
+
+
+And the link to download the csv file is
+https://data.austintexas.gov/api/views/5tye-7ray/rows.csv?accessType=DOWNLOAD
+
+This has 1.14 million rows and 24 columns
+
+## Read the data in the CSV format and select only 7 columns 
+
+```{r}
+
+water <- read_csv('https://data.austintexas.gov/api/views/5tye-7ray/rows.csv?accessType=DOWNLOAD')
+  
+
+# selet only 6 columns from the data set to reduce the volumn of data. 
+
+water <- tibble('siteName' = water$SITE_NAME,
+                'siteType' = water$SITE_TYPE ,
+                'sampleTime' = water$SAMPLE_DATE,
+                'parameterType' = water$PARAM_TYPE,
+                'parameter'=water$PARAMETER,
+                'result'= water$RESULT,
+                'unit'= water$UNIT)
+
+```
+
+```{r}
+glimpse(water)
+
+```
+
+## Reduce the size by filtering out certain parameeters and parameterTypes
+
+```{r}
+# Eventhough this dataset has ony 7 columns, it has 1.14 million rows. Inorder to make the dataset more simple, I want to reduce the size 
+# by filtering out rows as follows. After couple of iterations I figured out parameterType is the column I want to apply the filter.
+
+unique(water$parameterType)
+
+filtered_water <- filter(water, (parameterType == 'Alkalinity/Hardness/pH') 
+                                 | parameterType == 'Conventionals')
+
+glimpse(filtered_water)  # The filtered data has a reduced the size of only 60,372 Observations
+
+#Apply another filter on the column parameter
+filtered_water <- subset(filtered_water, (parameter =='PH')|(parameter == 'WATER TEMPERATURE'))
+
+glimpse(filtered_water) # Thus the number of observations reduced to 52,929
+
+summary(filtered_water)
+
+```
+
+
+## Change the data-type of the columns to reflect the nature of the data
+
+```{r}
+# some of the columns should be factors. factor is a categorical variable which means it contains limited number of values.
+
+unique(filtered_water$siteType)
+unique(filtered_water$unit)
+unique(filtered_water$parameterType)
+unique(filtered_water$parameter)
+
+
+filtered_water$siteType <- as.factor(filtered_water$siteType)
+filtered_water$unit <- as.factor(filtered_water$unit)
+filtered_water$parameterType <- as.factor(filtered_water$parameterType)
+filtered_water$parameterType <- as.factor(filtered_water$parameterType)
+
+glimpse(filtered_water)
+
+# SampleTime is stored as Character. That should be convered to date format
+filtered_water$sampleTime <- mdy_hms(filtered_water$sampleTime)
+
+summary(filtered_water)
+
+```
+
+
+## Tidy up the data
+
+```{r}
+# There is 1 observation for which the unit is 'Feet'. 
+# That should be a mistake. Lets look into that observation using following command
+
+subset(filtered_water,unit=='Feet')
+
+# considering the parameter and result, the unit should be 'Fahrenheit'. 
+# In order to change the value, lets find the id of the observation
+
+convert<-which(filtered_water$unit == 'Feet')
+
+filtered_water$unit[convert] <- 'Deg. Fahrenheit' # this is how Fahrenheit unit is mentioned for other observations
+
+# There are 7 observations with unit 'MG/L'. That seems to be incorrect. Lets see those observations
+subset(filtered_water,unit == 'MG/L')
+
+
+# For the observations with 'result' around 70, the unit should be 'Deg. Fahrenheit' . There is one such observation
+# For the observations with 'result' around 20, the unit should be 'Deg. Celsius'. There are 3 such observation
+# For the observations with 'result' around 7, the unit should be 'Standard units' for PH. There are 3 such observation
+# Following statements transform unit column to the correct values
+
+convert <- which(filtered_water$unit == 'MG/L' & filtered_water$result > 70)
+filtered_water$unit[convert] <- 'Deg. Fahrenheit'
+
+convert <- which(filtered_water$unit == 'MG/L' & filtered_water$result > 19)
+filtered_water$unit[convert] <- 'Deg. Celsius'
+
+convert <- which(filtered_water$unit == 'MG/L')
+filtered_water$unit[convert] <- 'Standard units'
+
+summary(filtered_water)
+```
+
+
+```{r}
+# Looks like the result has some unusually high value. Lets see those observations
+
+subset(filtered_water,result > 1000)
+
+# There are 74 observations with water temperature higher than 1000.
+#That is clearly as mistake. I don't have a way to assume the correct 
+# values. Also there is 1 observation with result = NA.  so I am removing those observations
+
+remove <- which(filtered_water$result > 1000 | is.na(filtered_water$result))
+filtered_water <- filtered_water[-remove,]
+
+summary(filtered_water)
+
+```
+
+```{r}
+# The unit is a factor. Eventhough there is no data against the values 'MG/L' and 'Feet' the summary still shows those levels
+# Following command removes those levels
+
+filtered_water$unit <- droplevels(filtered_water$unit)
+
+summary(filtered_water)
+```
+
+## Boxplot
+
+```{r}
+
+ggplot(data=filtered_water, mapping = aes(x=unit, y=result))+
+  geom_boxplot()
+```
+
+**There are 2 observerations as outliers and those are above 60. Most probabilty the units for those observation should be 'Deg. Fahrenheit'. So lets convert those into units into Deg. Fahrenheit**
+
+```{r}
+convert<- which(filtered_water$result>60 & filtered_water$unit == 'Deg. Celsius')
+filtered_water$unit[convert] <- 'Deg. Fahrenheit'
+
+#Boxplot again
+
+ggplot(data=filtered_water, mapping = aes(x=unit, y= result))+
+  geom_boxplot()
+```
+
+
+## Convert Fahrenheit to Celcius
+** Convert the observations in such a way that, unit of water temperature will be thesame for all the observations**
+
+```{r}
+fahrenheit <- which(filtered_water$unit=='Deg. Fahrenheit')
+filtered_water$result[fahrenheit] <- (filtered_water$result[fahrenheit] -32) *(5.0/9.0)
+filtered_water$unit[fahrenheit] <- 'Deg. Celsius'
+```
+
+##Boxplot after converting Fahrenheit into Celcius
+
+```{r}
+ggplot(data=filtered_water, mapping = aes(x=unit, y= result))+
+  geom_boxplot()
+```
+
+**Now the data is clean and ready for analysis**
+
+# Data Set 3 : NYPD Motor Vehicle Collisions. 
+
+**Details of Motor Vehicle Collisions in New York City provided by the Police Department (NYPD)**
+
+The URL for the site is https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95  and the link for downloading the CSV file is https://data.cityofnewyork.us/api/views/h9gi-nx95/rows.csv?accessType=DOWNLOAD
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\NYPD_Motor_Vehicle_Collisions.JPG)
+
+As we see in the site, this file has about 1.13 Million of observations with 29 variables. The data has been updated on October 4th 2017.
+
+
+## Read the data from the URL and reduce the size by applying filters
+
+```{r}
+
+url <- 'https://data.cityofnewyork.us/api/views/h9gi-nx95/rows.csv?accessType=DOWNLOAD'
+
+mvc <- read_csv(url)
+
+glimpse(mvc)
+
+remove <- which(is.na(mvc$'ZIP CODE') == TRUE)
+mvc <- mvc[-remove,]
+
+remove <- which(is.na(mvc$LATITUDE) == TRUE)
+mvc <- mvc[-remove,]
+
+
+filterout <- which((mvc$'CONTRIBUTING FACTOR VEHICLE 1' == 'Driver Inattention/Distraction'|
+                 mvc$'CONTRIBUTING FACTOR VEHICLE 1' == 'Failure to Yield Right-of-Way'|
+                 mvc$'CONTRIBUTING FACTOR VEHICLE 1' == 'Backing Unsafely'|
+                 mvc$'CONTRIBUTING FACTOR VEHICLE 1' == 'Fatigued/Drowsy'))
+mvc <- mvc[filterout,]
+
+#longitude =0.0 seems to be a mistake. Lets see the row
+
+remove <- which(mvc$LONGITUDE == 0)
+mvc <- mvc[-remove,]
+
+remove <- which(mvc$'VEHICLE TYPE CODE 1'=="OTHER")
+mvc <- mvc[-remove,]
+```
+
+## Select 13 columns out of 29 and Tidy up the data
+
+```{r}
+mvc <- tibble("borough"=mvc$BOROUGH,
+              "lattitude"=mvc$LATITUDE,
+              "longitude"=mvc$LONGITUDE,
+              "NoOfInjured"=mvc$'NUMBER OF PERSONS INJURED',
+              "NoOfKilled" = mvc$'NUMBER OF PERSONS KILLED',
+              "NoOfPedInjured"= mvc$'NUMBER OF PEDESTRIANS INJURED',
+              "NoOfPedKilled" = mvc$'NUMBER OF PEDESTRIANS KILLED',
+              "NoOfCycInjured" = mvc$'NUMBER OF CYCLIST INJURED',
+              "NoOfCycKilled"= mvc$'NUMBER OF CYCLIST KILLED',
+              "NoOfMotInjured"=mvc$'NUMBER OF MOTORIST INJURED',
+              "NoOfMotKilled"=mvc$'NUMBER OF MOTORIST KILLED',
+              "ConFacVeh1"=mvc$'CONTRIBUTING FACTOR VEHICLE 1',
+              "VehType1"=mvc$'VEHICLE TYPE CODE 1')
+
+filterout <- which (mvc$VehType1 == "PASSENGER VEHICLE" |
+                     mvc$VehType1 == "SPORT UTILITY / STATION WAGON" |
+                     mvc$VehType1 == "TAXI" |
+                     mvc$VehType1 == "VAN" |
+                     mvc$VehType1 == "PICK-UP TRUCK")
+
+mvc <- mvc[filterout,]
+
+unique(mvc$VehType1)
+unique(mvc$borough)
+unique(mvc$ConFacVeh1)
+
+head(mvc)
+glimpse(mvc)
+
+```
+
+
+```{r}
+
+conv <- which(mvc$VehType1=='PICK-UP TRUCK')
+
+mvc$VehType1[conv] <- 'P_TRUCK'
+
+convert<- which(mvc$VehType1=='SPORT UTILITY / STATION WAGON')
+mvc$VehType1[convert] <- 'SUV/STA.WAG'
+
+convert<- which(mvc$VehType1=='PASSENGER VEHICLE')
+mvc$VehType1[convert] <- 'PASS.VEHI'
+
+glimpse(mvc)
+
+```
+
+**Now the data is Tidy enough for further analysis**
+
+## No. of accidents by borough and Vehicle Type  
+
+```{r}
+mvc_acc_VehType <- mvc%>%
+                   select (1,4,5,6,7,8,9,10,11,12,13) %>%
+                   group_by (borough,VehType1)  %>% summarise(
+                            totInjured = sum(NoOfInjured),
+                            totKilled=sum(NoOfKilled), 
+                            totPedInjured = sum(NoOfPedInjured), 
+                            totPedKilled = sum(NoOfPedKilled), 
+                            totCycInjured = sum(NoOfCycInjured), 
+                            totCycKilled = sum(NoOfCycKilled),    
+                            totMotInjured = sum(NoOfMotInjured), 
+                            totMotKilled = sum(NoOfMotKilled))
+
+head(mvc_acc_VehType)
+
+```
+
+
+```{r eval=FALSE}
+p<-ggplot(data=mvc_acc_VehType, aes(x=VehType1, y = totInjured, fill = borough)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  geom_text(aes(label=totInjured), vjust=.9, hjust=1,position= position_dodge(width=0.9)) +
+  geom_point(mapping = aes(color = borough  ), method = 'loess') + 
+  xlab("Vehicle Type") + ylab("Total Number Of Injured") 
+
+
+# The linkg https://cran.r-project.org/web/packages/ggthemes/ggthemes.pdf
+# Gives all the information about the ggthemes.
+
+p + theme_economist(horizontal=FALSE) +
+scale_colour_economist() +
+coord_flip()
+
+```
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\mvc_acc_VehType.PNG)
+
+### Conclusion 1
+The above picture clearly says that the number of accidents is higher in Brooklyn and Queens compared to other boroughs. The possible reasons are (1) demegraphy of the residents (2) Traffic regulations (3) Busy streets and businesses etc. Also The above image shows that total number of accidents by Passenger Vehicle OR SUV/Staion Wagon is much higher than Pickup-truck, taxi or van. But we can not conclude that, the accidents rate of such vechicles are higher. Because, we dont take into account the total number of vechicles in those cities on during that period.In this data, We consider only the vehicles made accidents. In order to make such concusion, we need to have the number of passenger vehicles or SUV/STA.WAGON in New York City during that period. That will allow us the calculate percentage of such vehicles made accident. Simillary, The number Taxi or Pickup truck may be much lesser than other kids of cars and hence the number of accidents made by those cars also will be considerably low in number
+
+
+## No. of accidents by contributing factor  
+
+```{r}
+mvc_acc_Reason <- mvc%>%
+                   select (1,4,5,6,7,8,9,10,11,12,13) %>%
+                   group_by (borough,ConFacVeh1)  %>% 
+                   summarise(totInjured = sum(NoOfInjured),
+                             totKilled=sum(NoOfKilled), 
+                             totPedInjured = sum(NoOfPedInjured),
+                             totPedKilled = sum(NoOfPedKilled),
+                             totCycInjured = sum(NoOfCycInjured), 
+                             totCycKilled = sum(NoOfCycKilled), 
+                             totMotInjured = sum(NoOfMotInjured), 
+                             totMotKilled = sum(NoOfMotKilled))
+
+
+
+head(mvc_acc_Reason)
+```
+
+```{r eval=FALSE}
+ggplot(data=mvc_acc_Reason, aes(x=ConFacVeh1, y = totInjured, fill = borough)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  geom_text(aes(label=totInjured), vjust=.9, hjust=1,position= position_dodge(width=0.9)) +
+  geom_point(mapping = aes(color = borough  ), method = 'loess') + 
+  xlab("Contributing Factor") + ylab("Total Number Of Injured") +
+  coord_flip() 
+
+```
+
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\mvc_acc_Reason.PNG)
+
+### Conclusion 2
+The above picture clearly says that out of all the contributing factors of the accidents, Driver Distraction, and failure to give right of way caused more accidents. Again this kind of accidents are more in brooklyn and Queens. This prompts to make more research on tha areas like (1) What are the main cause of distraction - (Cell Phone, Need of high vigilance while driving ( due to road conditions)) (2) More accidents are made by people from outside the town? - Lack of familarity of the roads could be one reason for not giving the right of way (3) Study the need to enforce defensive driving lessons (4) Check if other reasons like education, age, background etc has relation to the such contributing factors
+
+### Comments
+Following items also can be researhed using this dataset.
+
+1. Based on the frequency of accidents in the same location, extra regulations / traffic signals and lights can be deployed.But the exact street address is missing in most cases. Officers should pay more attention and fill all the information to reduce future accidents
+
+2. As the lattitude and longitude is available, comparision with other US cities (with heat maps) will be possible and hence adopt best traffic practices/regulations, road planning, mass commuting etc from the cities where accidents are low.
+
+
+
+
+
+
+
+
+
