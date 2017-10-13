@@ -6,9 +6,9 @@
 		<Author>Foster Provost, Tom Fawcett</Author>
 		<ISBN-13>9781449361327</ISBN-13>
 		<Publisher>O'Reilly Media</Publisher>
-		<Publication_date>7/25/2013</Publication_date>
+		<Publication date>7/25/2013</Publication_date>
 		<Pages>386</Pages>
-		<Related_Subject>Data Science</Related_Subject>
+		<Related Subject>Data Science</Related_Subject>
 	</book>
 	<book>
 		<ID>02</ID>
@@ -16,9 +16,9 @@
 		<Author>Jared P. Lander</Author>
 		<ISBN-13>9780321888037</ISBN-13>
 		<Publisher>Pearson Education</Publisher>
-		<Publication_date>09/23/2013</Publication_date>
+		<Publication date>09/23/2013</Publication_date>
 		<Pages>432</Pages>
-		<Related_Subject>R Programming</Related_Subject>
+		<Related Subject>R Programming</Related_Subject>
 	</book>
 	<book>
 		<ID>03</ID>
@@ -26,8 +26,8 @@
 		<Author>Hadley Wickham and Garrett Grolemund</Author>
 		<ISBN-13>9781491910399</ISBN-13>
 		<Publisher>O'Reilly Media</Publisher>
-		<Publication_date>12/06/2016</Publication_date>
+		<Publication date>12/06/2016</Publication_date>
 		<Pages>492</Pages>
-		<Related_Subject>R Programming</Related_Subject>
+		<Related Subject>R Programming</Related_Subject>
 	</book>
 </book-table>
