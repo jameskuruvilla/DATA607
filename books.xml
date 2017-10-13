@@ -23,7 +23,7 @@
 	<book>
 		<ID>03</ID>
 		<Title>R for Data Science</Title>
-		<Author>Hadley Wickham &amp; Garrett Grolemund</Author>
+		<Author>Hadley Wickham and Garrett Grolemund</Author>
 		<ISBN-13>9781491910399</ISBN-13>
 		<Publisher>O'Reilly Media</Publisher>
 		<Publication_date>12/06/2016</Publication_date>
