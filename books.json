@@ -1,0 +1,39 @@
+{
+    "book-table": {
+        "book": [
+	
+            {
+                "ID":"01",
+                "Title": "Data Science For Business",
+                "Author": "Foster Provost, Tom Fawcett",
+                "ISBN-13": "9781449361327",
+		"Publisher": "O'Reilly Media",
+		"Publication date": "7/25/2013",
+		"Pages": "386",
+		"Related Subject": "Data Science"
+            },
+            {
+		"ID": "02",
+		"Title": "R for Everyone",
+		"Author": "Jared P. Lander",
+		"ISBN-13": "9780321888037",
+		"Publisher": "Pearson Education",
+		"Publication date": "09/23/2013",
+		"Pages": "432",
+		"Related Subject": "R Programming"
+            },
+	    {
+		"ID": "03",
+		"Title": "R for Data Science",
+		"Author": "Hadley Wickham & Garrett Grolemund",
+		"ISBN-13": "9781491910399",
+		"Publisher": "O'Reilly Media",
+		"Publication date": "12/06/2016",
+		"Pages": "492",
+		"Related Subject": "R Programming"
+            }
+        ]
+    }
+}
+
+
