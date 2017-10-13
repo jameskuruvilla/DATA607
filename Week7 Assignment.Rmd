@@ -1,0 +1,126 @@
+---
+title: "Working with XML and JSON in R"
+author: 'James Kuruvilla'
+date: "October 13, 2017"
+
+output:
+  prettydoc::html_pretty:
+    #theme: architect 
+    #theme: cayman
+    #theme: leonids
+    theme: hpstr
+    highlight: github
+    #highlight: vignette
+    toc: true
+    number_sections: false
+    collapsed: true
+    smooth_scroll: true
+    df_print: paged
+subtitle: CUNY MSDS - DATA607 - Home Work-7
+---
+
+# Assignment
+**------------------------------------------------------------------------------------------------------------**  
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment7.JPG)
+**------------------------------------------------------------------------------------------------------------**  
+
+#  Library Definition
+
+**library(knitr)**  
+**library(XML)**  
+**library(RCurl)**  
+**library(jsonlite)**  
+
+**Following link is a good resource to do this assigment** 
+
+https://www.datacamp.com/community/tutorials/r-data-import-tutorial#data
+
+
+```{r include = FALSE}
+
+library(knitr)
+library(XML)
+library(RCurl)
+library(RJSONIO)
+library(jsonlite)
+
+```
+
+# Read URLS for XML, JSON and HTML from GitHub
+
+```{r}
+xml_url <- "https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/books.xml"
+json_url <- "https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/books.json"
+html_url <- "https://raw.githubusercontent.com/jameskuruvilla/DATA607/master/books.html"
+```
+
+#HTML
+
+```{r}
+
+html_file<- getURL(html_url)
+
+html_df <- readHTMLTable(html_file, which = 1)
+
+html_df
+```
+
+#XML
+
+```{r}
+
+xml_file <- getURL(xml_url)
+
+xml_df <- xmlToDataFrame(xml_file)
+
+xml_df
+```
+
+#JSON
+
+```{r}
+
+# fromJSON from the package RJASONIO is different from jasonlite
+# For documentation of jasonlite, goto https://cran.r-project.org/web/packages/jsonlite/jsonlite.pdf
+
+json_df <- as.data.frame(fromJSON(json_url))
+
+#Change Column names to match with other data frames
+names(json_df) <- c("ID","Title","Author","ISBN-13","Publisher","Publication_date","Pages","Related_Subject")
+
+json_df
+
+```
+
+#Compare Data Frames made out of JSON, HTML and XML Files
+
+```{r}
+all.equal(html_df,xml_df)
+
+```
+**Data frames formed from HTML and XML files are identical**
+
+```{r}
+
+all.equal(html_df,json_df)
+```
+
+Lets look into the difference between the data frames created from HTML and JSON files
+
+```{r}
+str(html_df)
+```
+
+```{r}
+str(json_df)
+```
+
+The default data types of the columns are different in both cases. Also I have changed the column names of the data frame created using JSON file.
+
+```{r}
+```
+
+# Conclusion
+
+**Data frames created from HTML and XML files are identical. But the structure of the data frame created from JSON file is different even though the content visually looks identical. The default data type of the columns in case of JSON is 'chr' where as the data type of the columns in case of both HTML and XML are 'Factor'**
+
