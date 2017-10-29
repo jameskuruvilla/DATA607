@@ -1,0 +1,90 @@
+---
+title: "Web APIs"
+author: 'James Kuruvilla'
+date: "October 28, 2017"
+
+output:
+  prettydoc::html_pretty:
+    #theme: architect 
+    #theme: cayman
+    #theme: leonids
+    theme: hpstr
+    #theme: tactile
+    
+   # toc: true
+subtitle: CUNY MSDS - DATA607 - Home Work-9
+---   
+
+# Assignment
+**------------------------------------------------------------------------------------------------------------**  
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment9.JPG)
+**------------------------------------------------------------------------------------------------------------**  
+
+#  Library Definition
+
+**library(knitr)**  
+**library(httr)**  
+**library(RCurl)**  
+**library(jsonlite)**  
+**library(RCurl)**  
+**library(stringr)**  
+**library(ggplot2)**  
+
+```{r include = FALSE}
+library(knitr)
+library(httr)
+library(dplyr)
+library(RCurl)
+library(jsonlite)
+library(stringr)
+library(ggplot2)
+
+```
+
+# Construct the Request URI using the Most Popular API for a time period of 30 days.
+
+Parameters included in the Most Popular API call:
+![](C:\Users\james\Desktop\Education\MS Data Analytics - CUNY\607- Data Acquisition and Management\Assignment9_2.JPG)
+
+```{r}
+time_period  <-30
+api_key      <- "5dd2de3b39cc481d9778841b27682d02"
+
+url_base <- paste0("http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/", time_period)
+url_base <- paste0(url_base, ".json?")
+url      <- paste0(url_base,"&api-key=", api_key)
+url
+  
+```
+
+# Scrape data from the web in json format and convert it to data frame
+
+```{r}
+myData<- GET(url)
+json_raw  <- content(myData, type = "text", encoding = "UTF-8")
+json_data <- fromJSON(json_raw)
+df        <- as.data.frame(json_data$results)
+df_final  <- df %>% select(section, byline, type,title,abstract, published_date)
+df_final$byline    <-  str_replace(df_final$byline, 'By ', "")
+colnames(df_final) <- c("Section","Author", "Type","Title", "Abstract", "Published_Date")
+
+kable(df_final,"html")  
+```
+
+#Graph the 20 Most Viewed New York Times Articles by Section by Time period 30
+
+
+```{r}
+df_final %>%
+   group_by(Section) %>% 
+   tally %>% 
+   ggplot(aes(Section, n, fill = Section)) +
+          geom_bar(stat = "identity", position = "stack") +
+          coord_flip()   + theme(legend.position = "none") + 
+    ggtitle("20 Most Viewed NY Times Articles by Section") +
+    xlab("Section") + ylab("Number of Views") +
+    geom_text(aes(label=n), vjust=0.5, hjust=1.1,color="black")
+```
+
+
+
