@@ -1,0 +1,37 @@
+---
+title: "Discussion 11 - Recommender Systems"
+author: 'James Kuruvilla'
+date: "Nov 09, 2017"
+
+output:
+  prettydoc::html_pretty:
+    #theme: architect 
+    #theme: cayman
+    #theme: leonids
+    heme: hpstr
+   
+    #highlight: github
+    #highlight: vignette
+    
+    #toc: true
+    #number_sections: false
+    #collapsed: true
+    #smooth_scroll: true
+    #df_print: paged
+subtitle: CUNY MSDS - DATA607
+---
+
+
+#Recommender Systems: Priceline.com
+
+Priceline.com provides multiple ways to save on hotel rooms, rental cars, airline tickets, vacation packages and cruises, priceline.com is a one-stop-shop for travelers looking for great deals.  In addition to getting compelling published prices for hundreds of thousands of hotels, rental cars and flights, travelers can take advantage of priceline.com's unique set of savings products, including Express Deals ®, Tonight-Only Deals ®, and our patented Name Your Own Price ® bidding service.   With  these services, travelers can book exceptional deals up to 60% off instantly on their desktop, tablet, or mobile device. Priceline.com's mobile products have been featured multiple times by Apple in iTunes,  highlighted by Google, and voted as some of the best tools for travelers by Travel+Leisure, Conde Nast and USA Today.
+
+###Who are your target users? 
+All those who would like go for vacations, personal trips, business trips etc. Also all those who needs rental car, hotel stay etc are the target users of this website. Also at the same time millons of hotel properties do business with Priceline.com and several rental car companies have deals with Priceline.com. Also they provide tickets of most of the airlines. 
+
+###What are their key goals? 
+Priceline.com's published goal is "Helping people to experience the world.". There are many websites provide simillar services. But priceline always strive to provide the best website experience for their customers.
+How can you help them accomplish these goals? Customers can provide constructive feedback as they get customer satisfaction survey. Priceline consider those reviews with high importance as they always would want to keep customers happy and that would help them retain those customers. Also data scientists will be able to help them by providing tools for doing sentiment analysis for parsing out huge volume of reviews.
+
+####Include specific recommendations about how to improve the site's recommendation capabilities going forward:  
+Based on the previous travels, customers who travelled in certain places with specific interests (Leasure/Adventurous/historical etc) can be categorized as a customer who is more likely to travel to the places with similar interests.  SO the recomendations/prediction can be made accordingly. Also based on the origin and destination of the travel, hotels on the way can be recommeded to the customer
